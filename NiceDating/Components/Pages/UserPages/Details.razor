@@ -1,0 +1,79 @@
+﻿@page "/persons/details"
+@inject DatingDB.Data.DatingDBContext DB
+@using DatingDB.Models
+@using DatingDB.Services
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+@inject UserService UserService
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+@test
+@{
+    if (UserService.IsLoggedIn)
+    {
+        test = "Logged In";
+    }
+    else
+    {
+        test = "Not logged In";
+    }
+
+}
+
+<div>
+    <h4>Person</h4>
+    <hr />
+    @if (person is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">FirstName</dt>
+            <dd class="col-sm-10">@person.FirstName</dd>
+            <dt class="col-sm-2">LastName</dt>
+            <dd class="col-sm-10">@person.LastName</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@person.Email</dd>
+            <dt class="col-sm-2">Login</dt>
+            <dd class="col-sm-10">@person.Login</dd>
+            <dt class="col-sm-2">Password</dt>
+            <dd class="col-sm-10">@person.Password</dd>
+            <dt class="col-sm-2">Password2</dt>
+            <dd class="col-sm-10">@person.Password2</dd>
+            <dt class="col-sm-2">CreateDate</dt>
+            <dd class="col-sm-10">@person.CreateDate</dd>
+            <dt class="col-sm-2">DeleteDate</dt>
+            <dd class="col-sm-10">@person.DeleteDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/persons/edit?id={person.Id}")">Edit</a> |
+            <a href="@($"/persons")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Person? person;
+
+    public string test = "NotSet";
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        person = await DB.Persons.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (person is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+
+
+    }
+}

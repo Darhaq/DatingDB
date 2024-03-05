@@ -1,0 +1,40 @@
+﻿@page "/persons"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject DatingDB.Data.DatingDBContext DB
+@using DatingDB.Models
+@using DatingDB.Services
+@inject UserService Userservice
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="persons/create">Create New</a>
+</p>
+
+@if (UserService.IsLoggedIn)
+{
+    <QuickGrid Class
+    ="table" Items
+    ="DB.Persons">
+        <PropertyColumn Property="person => person.FirstName" />
+        <PropertyColumn Property="person => person.LastName" />
+        <PropertyColumn Property="person => person.Email" />
+        <PropertyColumn Property="person => person.Login" />
+        <PropertyColumn Property="person => person.Password" />
+        <PropertyColumn Property="person => person.Password2" />
+        <PropertyColumn Property="person => person.CreateDate" />
+        <PropertyColumn Property="person => person.DeleteDate" />
+
+        <TemplateColumn Context="person">
+            <a href="@($"persons/edit?id={person.Id}")">Edit</a> |
+            <a href="@($"persons/details?id={person.Id}")">Details</a> |
+            <a href="@($"persons/delete?id={person.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+else
+{
+<p>You need to <a href="/login">login</a> to view this page.</p>
+}

@@ -1,0 +1,53 @@
+﻿@page "/login"
+@using DatingDB.Services
+@using DatingDB.Models
+@using DatingDB.Data
+@using Microsoft.EntityFrameworkCore
+@inject DatingDBContext DB
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+
+<EditForm Model="loginModel" OnValidSubmit="LoginUser" FormName="loginForm" Enhance>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Username:</label>
+        <InputText id="username" @bind-Value="loginModel.UserName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <InputText id="password" @bind-Value="loginModel.Password" type="password" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+
+    private async Task LoginUser()
+    {
+        var user = await DB.Persons.FirstOrDefaultAsync(u => u.Login == loginModel.UserName && u.Password == loginModel.Password);
+
+        if (user != null)
+        {
+            UserService.IsLoggedIn = true;
+            NavigationManager.NavigateTo("/persons");
+        }
+        else
+        {
+            Console.WriteLine("Invalid login");
+        }
+    }
+
+    private class LoginModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}
+

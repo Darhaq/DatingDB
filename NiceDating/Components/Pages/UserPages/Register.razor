@@ -1,0 +1,57 @@
+﻿@page "/register"
+@using DatingDB.Services
+@using DatingDB.Models
+@inject DatingDB.Data.DatingDBContext DB
+@inject NavigationManager NavigationManager
+@inject UserService UserService
+
+<h3>Register</h3>
+
+<EditForm Model="registerModel" OnValidSubmit="RegisterUser" FormName="registerForm" Enhance>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Username:</label>
+        <InputText id="username" @bind-Value="registerModel.UserName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <InputText id="password" @bind-Value="registerModel.Password" type="password" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="firstname" class="form-label">FirstName:</label>
+        <InputText id="firstname" @bind-Value="registerModel.FirstName" class="form-control" />
+        <ValidationMessage For="() => registerModel.FirstName" class="text-danger" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Register</button>
+</EditForm>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+
+    private async Task RegisterUser()
+    {
+        var newUser = new Person
+            {
+                Login = registerModel.UserName,
+                Password = registerModel.Password,
+            };
+
+        DB.Persons.Add(newUser);
+        await DB.SaveChangesAsync();
+
+        UserService.IsLoggedIn = true; // Automatically log in after registration
+        NavigationManager.NavigateTo("/persons");
+    }
+
+    private class RegisterModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        
+    }
+}

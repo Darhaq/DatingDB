@@ -1,0 +1,81 @@
+﻿@page "/persons/delete"
+@inject DatingDB.Data.DatingDBContext DB
+@using DatingDB.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Person</h4>
+    <hr />
+    @if (person is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">FirstName</dt>
+            <dd class="col-sm-10">@person.FirstName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">LastName</dt>
+            <dd class="col-sm-10">@person.LastName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@person.Email</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Login</dt>
+            <dd class="col-sm-10">@person.Login</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Password</dt>
+            <dd class="col-sm-10">@person.Password</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Password2</dt>
+            <dd class="col-sm-10">@person.Password2</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreateDate</dt>
+            <dd class="col-sm-10">@person.CreateDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DeleteDate</dt>
+            <dd class="col-sm-10">@person.DeleteDate</dd>
+        </dl>
+        <EditForm method="post" Model="person" OnValidSubmit="DeleteUser" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(person is null)">Delete</button> |
+            <a href="/users">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    Person? person;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        person = await DB.Persons.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (person is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteUser()
+    {
+        DB.Persons.Remove(person!);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/persons");
+    }
+}
